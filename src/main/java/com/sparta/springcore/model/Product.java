@@ -4,6 +4,7 @@ import com.sparta.springcore.dto.ItemDto;
 import com.sparta.springcore.dto.ProductMypriceRequestDto;
 import com.sparta.springcore.dto.ProductRequestDto;
 import com.sparta.springcore.model.Timestamped;
+import com.sparta.springcore.util.URLValidator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
