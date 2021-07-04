@@ -37,7 +37,7 @@ public class ProductService {
 
     @Transactional // 메소드 동작이 SQL 쿼리문임을 선언합니다.
     public Product updateProduct(Long id, ProductMypriceRequestDto requestDto) {
-        Product product = productRepository.findById(id).orElseThrow(
+        Product product = productRepository.findById(id).orElseThrow(           // test 주체자가 어떤 상황에 따라 어떤 결과가 나온다 설정해주지 않으면 자동 반영이 안됨
                 () -> new NullPointerException("해당 아이디가 존재하지 않습니다.")
         );
 
