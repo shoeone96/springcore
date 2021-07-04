@@ -7,13 +7,20 @@ import com.sparta.springcore.repository.ProductRepository;
 import com.sparta.springcore.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)         // 추가하는 부분
 class ProductServiceTest {
     @Mock
-    ProductRepository productRepository;        // mock을 사용하여 굳이 MockRepository를 생성하지 않더라도 실제 productRepositroy를 통해서 Mock 형식의 객체를 가져올 수 있다
+    ProductRepository productRepository;
 
     @Test
     @DisplayName("updateProduct() 에 의해 관심 가격이 3만원으로 변경되는지 확인")
@@ -37,12 +44,45 @@ class ProductServiceTest {
         Product product = new Product(requestProductDto, userId);
 
         ProductService productService = new ProductService(productRepository);
+        when(productRepository.findById(productId))
+                .thenReturn(Optional.of(product));
 
-        // when                 // productservice의 과정에서 잘 실현되어 들어오는가를 확인
+        // when
         Product result = productService.updateProduct(productId, requestMyPriceDto);
 
         // then
         assertEquals(myprice, result.getMyprice());
     }
 
+    @Test
+    @DisplayName("updateProduct() 에 의해 관심 가격이 100원 이하인 경우 에러 발생")
+    void updateProduct_abnormal() {
+        // given
+        Long productId = 100L;
+        int myprice = 50;       // 100원 이하라면 에러가 발생해야 하는 경우
+
+        ProductMypriceRequestDto requestMyPriceDto = new ProductMypriceRequestDto(
+                myprice
+        );
+
+        Long userId = 12345L;
+        ProductRequestDto requestProductDto = new ProductRequestDto(
+                "오리온 꼬북칩 초코츄러스맛 160g",
+                "https://shopping-phinf.pstatic.net/main_2416122/24161228524.20200915151118.jpg",
+                "https://search.shopping.naver.com/gate.nhn?id=24161228524",
+                2350
+        );
+
+        Product product = new Product(requestProductDto, userId);
+
+        ProductService productService = new ProductService(productRepository);      // Db 조회 등의 절차 없이 이런 결과가 나올 것이라 하고 값을 가져온 것임
+        when(productRepository.findById(productId))
+                .thenReturn(Optional.of(product));
+
+        // when
+        // then
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            productService.updateProduct(productId, requestMyPriceDto);
+        });
+    }
 }
