@@ -22,7 +22,7 @@ class ProductServiceTest {
     @Mock
     ProductRepository productRepository;
 
-    @Test
+@Test
     @DisplayName("updateProduct() 에 의해 관심 가격이 3만원으로 변경되는지 확인")
     void updateProduct_Normal() {
         // given
@@ -59,7 +59,7 @@ class ProductServiceTest {
     void updateProduct_abnormal() {
         // given
         Long productId = 100L;
-        int myprice = 50;       // 100원 이하라면 에러가 발생해야 하는 경우
+        int myprice = 50;       // 100원 이하라면 에러가 발생해야 하는 경
 
         ProductMypriceRequestDto requestMyPriceDto = new ProductMypriceRequestDto(
                 myprice
