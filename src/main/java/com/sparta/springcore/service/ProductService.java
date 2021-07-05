@@ -28,7 +28,7 @@ public class ProductService {
     }
 
     public Page<Product> getProducts(Long userId, int page, int size, String sortBy, boolean isAsc) {
-        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;        // spring framework 에서 가지고 잇는 내장함수
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
