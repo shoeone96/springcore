@@ -7,26 +7,25 @@ import com.sparta.springcore.service.ProductService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)     // spring까지 가동되는 방식(통합 검사) 여러 환경 이용 가능, 번호 생성 무작위
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)       // order 사용 가능하게 만들어주는 부분
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ProductIntegrationTest {
     @Autowired
-    ProductService productService;      // spring에서 만든 productservice 가져오는 부분
+    ProductService productService;
 
     Long userId = 100L;
-    Product createdProduct = null;      // 이 테스트에서 멤버 변수로 선정되면 밑에서 쓸 수 있음
+    Product createdProduct = null;
     int updatedMyPrice = -1;
 
     @Test
-    @Order(1)       // 쓰여진 순서대로 진행하는 코드
-    @DisplayName("신규 관심상품 등록")      // 임의로 넣어준 관심상품 정보
+    @Order(1)
+    @DisplayName("신규 관심상품 등록")
     void test1() {
         // given
         String title = "Apple <b>에어팟</b> 2세대 유선충전 모델 (MV7N2KH/A)";
@@ -39,9 +38,9 @@ class ProductIntegrationTest {
                 linkUrl,
                 lPrice
         );
-        // when     // 실제 결과값
+        // when
         Product product = productService.createProduct(requestDto, userId);
-        // then     // 검증과정
+        // then
         assertNotNull(product.getId());
         assertEquals(userId, product.getUserId());
         assertEquals(title, product.getTitle());
@@ -80,8 +79,13 @@ class ProductIntegrationTest {
     @DisplayName("회원이 등록한 모든 관심상품 조회")
     void test3() {
         // given
+        int page = 0;
+        int size = 10;
+        String sortBy = "id";
+        boolean isAsc = false;
+
         // when
-        List<Product> productList = productService.getProducts(userId, page, size, sortBy, isAsc);
+        Page<Product> productList = productService.getProducts(userId, page, size, sortBy, isAsc);
 
         // then
         // 1. 전체 상품에서 테스트에 의해 생성된 상품 찾아오기 (상품의 id 로 찾음)
@@ -91,7 +95,7 @@ class ProductIntegrationTest {
                 .findFirst()
                 .orElse(null);
         // 2. Order(1) 테스트에 의해 생성된 상품과 일치하는지 검증
-        assertNotNull(foundProduct);        // 상품 찾아왔는데 없으면 안되겠지...
+        assertNotNull(foundProduct);
         assertEquals(userId, foundProduct.getUserId());
         assertEquals(this.createdProduct.getId(), foundProduct.getId());
         assertEquals(this.createdProduct.getTitle(), foundProduct.getTitle());

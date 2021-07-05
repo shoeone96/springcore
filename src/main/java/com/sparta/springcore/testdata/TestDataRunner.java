@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component      // 이 부분 들어가면 시작하면서 아래의 메소드를 실행하고 시작함
+// @Component      // 이 부분 들어가면 시작하면서 아래의 메소드를 실행하고 시작함
 public class TestDataRunner implements ApplicationRunner {
 
     @Autowired

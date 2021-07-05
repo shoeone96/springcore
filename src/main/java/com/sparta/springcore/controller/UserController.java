@@ -75,7 +75,6 @@ public class UserController {
         user1.setRole(UserRole.USER);
         // 회원 "user1" 객체를 영속화
         userRepository.save(user1);
-
         // 회원 "user1" 을 조회
         User foundUser1 = userRepository.findByUsername("user1").orElse(null);
         // 회원 "user1" 을 또 조회
