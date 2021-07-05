@@ -5,6 +5,10 @@ import com.sparta.springcore.dto.ProductRequestDto;
 import com.sparta.springcore.model.Product;
 import com.sparta.springcore.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,21 +27,25 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<Product> getProducts(Long userId) {
-        return productRepository.findAllByUserId(userId);
+    public Page<Product> getProducts(Long userId, int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.findAllByUserId(userId, pageable);
     }
 
     @Transactional // 메소드 동작이 SQL 쿼리문임을 선언합니다.
-    public Product createProduct(ProductRequestDto requestDto, Long userId) {       // 상품 정보 말고도 userId도 같이 전달
+    public Product createProduct(ProductRequestDto requestDto, Long userId) {
         // 요청받은 DTO 로 DB에 저장할 객체 만들기
-        Product product = new Product(requestDto, userId);          // 새 객체 생성 시 전달한다
+        Product product = new Product(requestDto, userId);
         productRepository.save(product);
         return product;
     }
 
     @Transactional // 메소드 동작이 SQL 쿼리문임을 선언합니다.
     public Product updateProduct(Long id, ProductMypriceRequestDto requestDto) {
-        Product product = productRepository.findById(id).orElseThrow(           // test 주체자가 어떤 상황에 따라 어떤 결과가 나온다 설정해주지 않으면 자동 반영이 안됨
+        Product product = productRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("해당 아이디가 존재하지 않습니다.")
         );
 
@@ -50,85 +58,13 @@ public class ProductService {
         product.updateMyPrice(myPrice);
         return product;
     }
+
     // 모든 상품 조회 (관리자용)
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public Page<Product> getAllProducts(int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.findAll(pageable);
     }
 }
-
-//package com.sparta.springcore.service;
-//
-//import com.sparta.springcore.dto.ProductMypriceRequestDto;
-//import com.sparta.springcore.dto.ProductRequestDto;
-//import com.sparta.springcore.model.Product;
-//import com.sparta.springcore.repository.ProductRepository;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//
-//import java.sql.SQLException;
-//import java.util.List;
-//
-//@RequiredArgsConstructor
-//@Service
-//public class ProductService {
-//    // 멤버 변수 선언
-//    private final ProductRepository productRepository;
-//
-//    //    public List<Product> getProducts() throws SQLException {
-////        ProductRepository productRepository = new ProductRepository();
-////        return productRepository.getProducts();
-////    }
-//
-//    public List<Product> getProducts() throws SQLException {
-//        // 멤버 변수 사용
-//        return productRepository.getProducts();
-//    }
-//
-////    public Product createProduct(ProductRequestDto requestDto) throws SQLException {
-////        ProductRepository productRepository = new ProductRepository();
-////        // 요청받은 DTO 로 DB에 저장할 객체 만들기
-////        Product product = new Product(requestDto);
-////        productRepository.createProduct(product);
-////        return product;
-////    }
-//    public Product createProduct(ProductRequestDto requestDto) throws SQLException {
-//        // 요청받은 DTO 로 DB에 저장할 객체 만들기
-//        Product product = new Product(requestDto);
-//        productRepository.createProduct(product);
-//        return product;
-//    }
-//
-////    public Product updateProduct(Long id, ProductMypriceRequestDto requestDto) throws SQLException {
-////        ProductRepository productRepository = new ProductRepository();
-////        Product product = productRepository.getProduct(id);
-////        if (product == null) {
-////            throw new NullPointerException("해당 아이디가 존재하지 않습니다.");
-////        }
-////        int myPrice = requestDto.getMyprice();
-////        productRepository.updateProductMyPrice(id, myPrice);
-////        return product;
-////    }
-//    public Product updateProduct(Long id, ProductMypriceRequestDto requestDto) throws SQLException {
-//        Product product = productRepository.getProduct(id);
-//        if (product == null) {
-//            throw new NullPointerException("해당 아이디가 존재하지 않습니다.");
-//        }
-//        int myPrice = requestDto.getMyprice();
-//        productRepository.updateProductMyPrice(id, myPrice);
-//        return product;
-//    }
-//}
-//
-////package com.sparta.springcore;
-////
-////import java.sql.SQLException;
-////import java.util.List;
-////
-////public class ProductService {
-////
-//
-////
-//
-////
-//
-////}
